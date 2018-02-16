@@ -1,0 +1,35 @@
+public function insertJarProductsPrices() {
+	    $url = "secret-link";
+	    $xml = simplexml_load_file($url);
+	    $products = $xml->products->product;
+
+	    // Get only names and ids of all manufacturers
+	    $this->load->model('catalog/manufacturer');
+	    $manufacturersParameters = $this->model_catalog_manufacturer->getManufacturerIdsAndNames();
+
+	    $manufacturerIds = array();
+	    $manufacturerNames = array();
+
+	    /**
+	     * Here's the final associative array, where we will save the data as:
+	     * Array key   => manufacturer id
+	     * Array Value => manufacturer name
+	     */
+	    $manufacturers = array();
+
+	    foreach ($manufacturersParameters->rows as $parameter) {
+		    array_push($manufacturerIds, $parameter['manufacturer_id']);
+		    array_push($manufacturerNames, strtolower($parameter['name']));
+		    // Set id as a key and name as a value to the array
+	    	$manufacturers = array_combine($manufacturerIds, $manufacturerNames);
+	    }
+
+	    foreach ($products as $product) {
+
+	    	// Compare the current product category
+			$currentProductBrandName = strtolower($product->brand_name);
+			$currentProductPrice = $product->price;
+
+		   var_dump(array_search($currentProductBrandName, $manufacturers)); die;
+	    }
+    }
