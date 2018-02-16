@@ -1,0 +1,58 @@
+public function insertJarProductsBrands() {
+		$url = "secret-url -_-";
+		$xml = simplexml_load_file($url);
+		$products = $xml->products->product;
+		$brands = array();
+
+		foreach ($products as $product) {
+			array_push($brands, $product->brand_name);
+		}
+
+		$this->load->model('catalog/manufacturer');
+		$uniqueSapirBrands = $this->model_catalog_manufacturer->getManufacturers();
+		$uniquerJarBrands= array_unique($brands);
+
+		// Make all jar brands values to lowercase
+		$jarBrands = array_map('strtolower', $uniquerJarBrands);
+
+		$sapirBrands = array();
+		$brandsToAdd = array();
+
+		foreach ($uniqueSapirBrands as $uniqueSapirBrand) {
+			/**
+			 * Currently, $uniqueSapirBrands is associative array
+			 * To compare their values, we need to add only their names to new index array
+			 * We're adding only the names to new array named $sapirBrands..
+			 */
+			array_push($sapirBrands, strtolower($uniqueSapirBrand['name']));
+		}
+
+		// Loop through all jar brands
+		foreach ($jarBrands as $jarBrand) {
+			//Check for not existing ones
+			if (!in_array($jarBrand, $sapirBrands)) {
+				//Add the not existing to new array
+				array_push($brandsToAdd, $jarBrand);
+			}
+		}
+
+		$addJarBrandQuery = "INSERT INTO " . DB_PREFIX . "manufacturer (name) VALUES ";
+
+		foreach ($brandsToAdd as $brand) {
+			//Detect character encoding
+			if (mb_detect_encoding($brand) == "ASCII") {
+				/**
+				 * Add the array values dynamically
+				 * In this case we will create only 1 request to the db, not 50 :)
+				 */
+				$addJarBrandQuery .= "(\"$brand\"),";
+
+			}
+		}
+
+		$addJarBrandQuery = rtrim($addJarBrandQuery, ',');
+
+		//Execute the query
+		$this->db->query($addJarBrandQuery);
+
+	}
