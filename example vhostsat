@@ -1,0 +1,13 @@
+<VirtualHost *:80>
+    ServerName test.local
+    DocumentRoot "C:/xampp/htdocs/projects/asd"
+    SetEnv APPLICATION_ENV "development"
+    <Directory "C:/xampp/htdocs/projects/asd">
+        DirectoryIndex index.php
+        AllowOverride All
+        Order allow,deny
+        Allow from all
+    </Directory>
+</VirtualHost>
+
+system32/drivers/etc/hosts :: 127.0.0.1 		server-name
